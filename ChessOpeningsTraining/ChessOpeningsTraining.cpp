@@ -10,6 +10,7 @@ int main()
 	bool left_button_flag = false; //true if LMB is being hold
 	sf::Sprite *selected_piece = nullptr;
 	sf::Vector2f original_piece_position;
+	int piece_row = -1, piece_col = -1; //Indexes of chosen chess piece
 	while (window.isOpen())
 	{
 		sf::Event event;
@@ -23,8 +24,10 @@ int main()
 			{
 				if (event.mouseButton.button == sf::Mouse::Left && !left_button_flag)
 				{
-					selected_piece = chessboard.checkIfWasSelected(sf::Mouse::getPosition(window));
+					//Check if chess piece was selected
+					selected_piece = chessboard.checkIfWasSelected(sf::Mouse::getPosition(window),piece_row, piece_col);
 					left_button_flag = true;
+
 					if (selected_piece != nullptr)
 						original_piece_position = selected_piece->getPosition();
 					
@@ -34,8 +37,17 @@ int main()
 			{
 				if (event.mouseButton.button == sf::Mouse::Left && left_button_flag)
 				{
-						left_button_flag = false;
-			
+					left_button_flag = false;
+					//If chess piece was selected, reset its position
+					if (selected_piece != nullptr && !chessboard.checkIfLegal(sf::Mouse::getPosition(window), piece_row, piece_col,original_piece_position))
+					{				
+						chessboard.set_piece_position(selected_piece, original_piece_position);
+
+					}
+					selected_piece = nullptr;
+					piece_row = -1;
+					piece_col = -1;
+
 				}
 			}
 		}
@@ -43,7 +55,7 @@ int main()
 		//Update selected piece position (only to display)
 		if (left_button_flag && selected_piece != nullptr)
 		{
-			chessboard.set_piece_position(selected_piece, sf::Mouse::getPosition(window));
+			chessboard.set_piece_position(selected_piece, sf::Mouse::getPosition(window), 30);
 		}
 
 		window.clear();
