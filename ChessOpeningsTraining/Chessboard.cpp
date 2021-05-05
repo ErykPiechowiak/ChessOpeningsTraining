@@ -4,9 +4,10 @@
 Chessboard::Chessboard()
 {
 	chessboard_texture_.loadFromFile("chessboard.jpg");
+	flipped_chessboard_texture_.loadFromFile("chessboard_flipped2.jpg");
 	chess_pieces_texture_.loadFromFile("chess_pieces.png");
 	empty_texture_.create(60, 60);
-
+	
 	//assigning every square its position on the board
 	int offset = 42;
 	int y = 0;
@@ -54,7 +55,7 @@ void Chessboard::set_piece_position(sf::Sprite * square, sf::Vector2i position, 
 void Chessboard::initChessboard()
 {
 	chessboard_.setTexture(chessboard_texture_);
-	int y;
+//	int y;
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
@@ -96,6 +97,10 @@ bool Chessboard::checkIfLegal(sf::Vector2i mouse_position, int &row, int &col, s
 	std::cout << std::endl;
 	//change selected piece position to the original one (the position before drawing)
 	s_chess_pieces_[row][col].setPosition(original_position);
+	int modifier = 1; 
+	if (flipped)
+		modifier = -1;//if board is flipped - change pawns movement
+	
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
@@ -111,31 +116,27 @@ bool Chessboard::checkIfLegal(sf::Vector2i mouse_position, int &row, int &col, s
 				if (chess_pieces_[row][col] == -6 && white_move_)
 				{
 					//one square forward
-					if ((i == row - 1 && j == col) && chess_pieces_[i][j] == 0)
+					if ((i == row - (1*modifier) && j == col) && chess_pieces_[i][j] == 0)
 					{
 						makeMove(row, col, i, j);
 						return true;
 					}
 					//two squares forward
-					if ((i == row - 2 && j == col && row == 6) && chess_pieces_[i][j] == 0 && chess_pieces_[i + 1][j] == 0)
+					if ((i == row - (2*modifier) && j == col && (row == 6 || row == 1)) && chess_pieces_[i][j] == 0 && chess_pieces_[i + 1][j] == 0)
 					{
-						chess_pieces_[i + 1][j] = -10;
-						white_en_passant_ = &chess_pieces_[i + 1][j];
+						chess_pieces_[i + (1*modifier)][j] = -10;
+						white_en_passant_ = &chess_pieces_[i + (1*modifier)][j];
 						makeMove(row, col, i, j);
 						return true;
 					}
 					//captures
-					if (i == row - 1 && (j == col - 1 || j == col + 1) && chess_pieces_[i][j] > 0 && chess_pieces_[i][j] != 2)
+					if (i == row - (1*modifier) && (j == col - 1 || j == col + 1) && chess_pieces_[i][j] > 0 && chess_pieces_[i][j] != 2)
 					{
-						//if (chess_pieces_[i][j] == 10)
-					//	{
-						//	chess_pieces_[i + 1][j] = 0;
-						//	set_piece_texture(i + 1, j);
-						//}
+						//check en passant
 						if (chess_pieces_[i][j] == 10)
 						{
-							chess_pieces_[i + 1][j] = 0;
-							set_piece_texture(i + 1, j);
+							chess_pieces_[i + (1*modifier)][j] = 0;
+							set_piece_texture(i + (1*modifier), j);
 						}
 						makeMove(row, col, i, j);
 						return true;
@@ -145,40 +146,59 @@ bool Chessboard::checkIfLegal(sf::Vector2i mouse_position, int &row, int &col, s
 				if (chess_pieces_[row][col] == 6 && !white_move_)
 				{
 					//one squares forward
-					if ((i == row + 1 && j == col) && chess_pieces_[i][j] == 0)
+					if ((i == row + (1*modifier) && j == col) && chess_pieces_[i][j] == 0)
 					{
 						makeMove(row, col, i, j);
 						return true;
 					}
 					//two squares forward
-					if ((i == row + 2 && j == col && row == 1) && chess_pieces_[i][j] == 0 && chess_pieces_[i - 1][j] == 0)
+					if ((i == row + (2*modifier) && j == col && (row == 1 || row == 6)) && chess_pieces_[i][j] == 0 && chess_pieces_[i - 1][j] == 0)
 					{
-						chess_pieces_[i - 1][j] = 10;
-						black_en_passant_ = &chess_pieces_[i - 1][j];
+						chess_pieces_[i - (1*modifier)][j] = 10;
+						black_en_passant_ = &chess_pieces_[i - (1*modifier)][j];
 						makeMove(row, col, i, j);
 						return true;
 					}
-
-				}
-				//captures
-				if (i == row + 1 && (j == col - 1 || j == col + 1) && chess_pieces_[i][j] < 0 && chess_pieces_[i][j] != -2)
-				{
-					//Check en passant
-					if (chess_pieces_[i][j] == -10)
+					//captures
+					if (i == row + (1*modifier) && (j == col - 1 || j == col + 1) && chess_pieces_[i][j] < 0 && chess_pieces_[i][j] != -2)
 					{
-						chess_pieces_[i - 1][j] = 0;
-						set_piece_texture(i - 1, j);
+						//Check en passant
+						if (chess_pieces_[i][j] == -10)
+						{
+							chess_pieces_[i - (1*modifier)][j] = 0;
+							set_piece_texture(i - (1*modifier), j);
+						}
+						makeMove(row, col, i, j);
+						return true;
 					}
-					makeMove(row, col, i, j);
-					return true;
 				}
 			}
-		
-				
 		}
 	}
 
 	return false;
+}
+
+void Chessboard::flipBoard()
+{
+	flipped = !flipped;
+	if (flipped)
+		chessboard_.setTexture(flipped_chessboard_texture_);
+	else
+		chessboard_.setTexture(chessboard_texture_);
+
+	
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			//change game logic 
+			std::swap(chess_pieces_[i][j], chess_pieces_[7 - i][7 - j]);
+			//change textures
+			set_piece_texture(i, j);
+			set_piece_texture(7 - i, 7 - j);
+		}
+	}
 }
 
 void Chessboard::set_piece_texture(int row, int col)

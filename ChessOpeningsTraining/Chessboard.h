@@ -10,13 +10,14 @@ public:
 
 	void set_piece_position(sf::Sprite *square, sf::Vector2f position, int offset = 0);
 	void set_piece_position(sf::Sprite *square, sf::Vector2i position, int offset = 0);
+	void set_piece_texture(int row, int col);
 	//void set_piece_position(sf::Sprite *square, sf::Vector2i position);
 
 	void initChessboard();
 	void resetChessboard();
 	sf::Sprite* checkIfWasSelected(sf::Vector2i point, int &row, int &column);
 	bool checkIfLegal(sf::Vector2i mouse_position, int &row, int &col, sf::Vector2f original_position);//function to check if a done move is legal
-	void set_piece_texture(int row, int col);
+	void flipBoard();
 
 
 private:
@@ -24,6 +25,7 @@ private:
 	void makeMove(int &row, int &col, int i, int j);
 	void checkEnPassant(int *&en_passant, bool &en_passant_flag);
 	sf::Texture chessboard_texture_;
+	sf::Texture flipped_chessboard_texture_;
 	sf::Texture chess_pieces_texture_;
 	sf::Texture empty_texture_;
 	std::array<std::array<sf::Sprite, 8>, 8> s_chess_pieces_;
@@ -32,6 +34,7 @@ private:
 	bool white_en_passant_flag_ = false;
 	int *black_en_passant_ = nullptr;
 	bool black_en_passant_flag_ = false;
+	bool flipped = false;
 
 	//sf::Sprite s_squares_[8][8];
 	/*

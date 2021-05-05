@@ -1,14 +1,17 @@
 ﻿#include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Chessboard.h"
+#include "Options.h"
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(600, 600), "Chess Openings Training Tool");
+	sf::RenderWindow window(sf::VideoMode(650, 600), "Chess Openings Training Tool");
 	Chessboard chessboard;
+	Options options(&chessboard);
 	chessboard.initChessboard();
 
 	bool left_button_flag = false; //true if LMB is being hold
 	sf::Sprite *selected_piece = nullptr;
+	sf::Sprite *selected_option = nullptr;
 	sf::Vector2f original_piece_position;
 	int piece_row = -1, piece_col = -1; //Indexes of chosen chess piece
 	while (window.isOpen())
@@ -30,6 +33,14 @@ int main()
 
 					if (selected_piece != nullptr)
 						original_piece_position = selected_piece->getPosition();
+
+					//Check if any available option was selected
+					options.checkIfWasSelected(sf::Mouse::getPosition(window));
+					//selected_option = options.checkIfWasSelected(sf::Mouse::getPosition(window));
+					//if (selected_option != nullptr)
+					//{
+					//	chessboard.flipBoard();
+					//}
 					
 				}
 			}
@@ -61,6 +72,7 @@ int main()
 		window.clear();
 		//draw chessboard
 		window.draw(chessboard.get_chessboard());
+		
 		//draw pieces
 		for (int i = 0; i < 8; i++)
 			for (int j = 0; j < 8; j++)
@@ -68,9 +80,11 @@ int main()
 				sf::Sprite sprite_to_draw = chessboard.get_square(i, j);
 				window.draw(sprite_to_draw);
 			}
-	
+		//draw options
+		window.draw(options.get_options());
 		//display
 		window.display();
+		//selected_option = nullptr;
 
 	}
 }
