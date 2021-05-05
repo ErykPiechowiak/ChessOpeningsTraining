@@ -122,7 +122,7 @@ bool Chessboard::checkIfLegal(sf::Vector2i mouse_position, int &row, int &col, s
 						return true;
 					}
 					//two squares forward
-					if ((i == row - (2*modifier) && j == col && (row == 6 || row == 1)) && chess_pieces_[i][j] == 0 && chess_pieces_[i + 1][j] == 0)
+					if ((i == row - (2*modifier) && j == col && (row == 6 || row == 1)) && chess_pieces_[i][j] == 0 && chess_pieces_[i + (1*modifier)][j] == 0)
 					{
 						chess_pieces_[i + (1*modifier)][j] = -10;
 						white_en_passant_ = &chess_pieces_[i + (1*modifier)][j];
@@ -152,7 +152,7 @@ bool Chessboard::checkIfLegal(sf::Vector2i mouse_position, int &row, int &col, s
 						return true;
 					}
 					//two squares forward
-					if ((i == row + (2*modifier) && j == col && (row == 1 || row == 6)) && chess_pieces_[i][j] == 0 && chess_pieces_[i - 1][j] == 0)
+					if ((i == row + (2*modifier) && j == col && (row == 1 || row == 6)) && chess_pieces_[i][j] == 0 && chess_pieces_[i - (1*modifier)][j] == 0)
 					{
 						chess_pieces_[i - (1*modifier)][j] = 10;
 						black_en_passant_ = &chess_pieces_[i - (1*modifier)][j];
