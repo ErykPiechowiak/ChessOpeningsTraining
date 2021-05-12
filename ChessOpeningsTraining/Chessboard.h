@@ -21,6 +21,7 @@ public:
 
 
 private:
+	bool checkBishopMove(int new_row, int new_col, int old_row, int old_col);
 	void printPiecePositions();
 	void makeMove(int &row, int &col, int i, int j);
 	void checkEnPassant(int *&en_passant, bool &en_passant_flag);

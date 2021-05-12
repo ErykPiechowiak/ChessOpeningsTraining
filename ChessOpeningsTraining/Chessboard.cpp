@@ -1,5 +1,6 @@
 #include "Chessboard.h"
 #include <iostream>
+#include <math.h>
 
 Chessboard::Chessboard()
 {
@@ -172,6 +173,50 @@ bool Chessboard::checkIfLegal(sf::Vector2i mouse_position, int &row, int &col, s
 						return true;
 					}
 				}
+				//white knight
+				if ((chess_pieces_[row][col] == -4 && white_move_))
+				{
+					if ((i == row + 2 || i == row -2 && j == col + 1 || j == col -1) ||
+						(i == row + 1 || i == row - 1 && j == col + 2 || j == col -2) && chess_pieces_[i][j] >= 0)
+					{
+						makeMove(row, col, i, j);
+						return true;
+					}
+				}
+				//black knight
+				if ((chess_pieces_[row][col] == 4 && !white_move_))
+				{
+					if ((i == row + 2 || i == row - 2 && j == col + 1 || j == col - 1) ||
+						(i == row + 1 || i == row - 1 && j == col + 2 || j == col - 2) && chess_pieces_[i][j] <= 0)
+					{
+						makeMove(row, col, i, j);
+						return true;
+					}
+				}
+				//white bishop
+				if (chess_pieces_[row][col] == -5 && white_move_)
+				{
+					if (abs(row - i) == abs(col - j) && chess_pieces_[i][j] >= 0)
+					{
+						if (checkBishopMove(i, j, row, col))
+						{
+							makeMove(row, col, i, j);
+							return true;
+						}
+					}
+				}
+				//black bishop
+				if (chess_pieces_[row][col] == 5 && !white_move_)
+				{
+					if (abs(row - i) == abs(col - j) && chess_pieces_[i][j] <= 0)
+					{
+						if (checkBishopMove(i, j, row, col))
+						{
+							makeMove(row, col, i, j);
+							return true;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -216,6 +261,28 @@ void Chessboard::set_piece_texture(int row, int col)
 		s_chess_pieces_[row][col].setTexture(empty_texture_);
 		s_chess_pieces_[row][col].setTextureRect(sf::IntRect(abs(chess_pieces_[row][col]) * 60 - 60, y, 60, 60));
 	}
+}
+
+bool Chessboard::checkBishopMove(int new_row, int new_col, int old_row, int old_col)
+{
+	int row_step;
+	int col_step;
+	int temp_i = new_row;
+	int temp_j = new_col;
+	new_row - old_row > 0 ? row_step = -1 : row_step = 1;
+	new_col - old_col > 0 ? col_step = -1 : col_step = 1;
+	temp_i += row_step;
+	temp_j += col_step;
+	while (temp_i != old_row || temp_j != old_col)
+	{
+		if (chess_pieces_[temp_i][temp_j] != 0)
+			return false;
+
+		temp_i += row_step;
+		temp_j += col_step;
+	}
+
+	return true;
 }
 
 void Chessboard::printPiecePositions()
