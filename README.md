@@ -1,5 +1,5 @@
 # ChessOpeningsTraining
 
-Chess training tool to practice openings. 
+Training tool to practice chess openings. 
 
 Project isn't finished yet
